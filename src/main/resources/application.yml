@@ -1,0 +1,13 @@
+bot:
+  qq:
+  password:
+  #ANDROID_PHONE,ANDROID_PAD,ANDROID_WATCH,IPAD,MACOS;
+  protocol: ANDROID_PHONE
+  listeningGroup:
+    - 676626322
+    - 1079695597
+    - 476323605
+    - 891290345
+    - 805913402
+    - 700142686
+  v2token: da8908bb-44e5-49fe-8d06-c7dd928fd4e6

@@ -1,0 +1,7 @@
+{
+    "8.9.63": {
+        "type": "fuqiuluo/unidbg-fetch-qsign",
+        "base_url": "http://127.0.0.1:8080",
+        "key": "114514"
+    }
+}
