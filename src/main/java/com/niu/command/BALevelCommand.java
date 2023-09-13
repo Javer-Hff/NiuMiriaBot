@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 
 @Component
 @Command
@@ -25,21 +26,16 @@ public class BALevelCommand implements BotCommand {
     }
 
     @Override
-    public Message execute(Member sender, MessageChain messageChain, Contact contact) {
-        MessageChainBuilder messageChainBuilder = new MessageChainBuilder();
-        String content = messageChain.contentToString();
-        int commandStart = content.indexOf(command());
-        String arg = content.substring(commandStart+command().length()+1);
-        String href = ApiUtil.getBAIntro(arg);
-        if (href.startsWith("http")){
-            try {
-                SeleniumUtil.screenshot(href,contact);
-                return null;
-            } catch (InterruptedException | IOException e) {
-                throw new RuntimeException(e);
-            }
+    public Message execute(Member sender, MessageChain messageChain, Contact contact,String...args) {
+        String arg = args[0];
+        String baContentUrl = ApiUtil.getBaContentUrl(arg);
+        try {
+            InputStream inputStream = SeleniumUtil.screenshot(baContentUrl);
+            Image image = ExternalResource.uploadAsImage(inputStream, contact);
+            return new MessageChainBuilder().append(image).build();
+        } catch (InterruptedException | IOException e) {
+            throw new RuntimeException(e);
         }
-        return messageChainBuilder.append(href).build();
     }
 }
 

@@ -10,11 +10,15 @@ import net.mamoe.mirai.event.EventHandler;
 import net.mamoe.mirai.event.ListeningStatus;
 import net.mamoe.mirai.event.SimpleListenerHost;
 import net.mamoe.mirai.event.events.GroupMessageEvent;
+import net.mamoe.mirai.message.data.Image;
 import net.mamoe.mirai.message.data.Message;
+import net.mamoe.mirai.message.data.MessageChainBuilder;
+import net.mamoe.mirai.utils.ExternalResource;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -58,9 +62,10 @@ public class GroupMessageHandler extends SimpleListenerHost {
             if (command!=null){
                 List<String> args = Arrays.stream(split).skip(1).toList();
                 Message executeResult = command.execute(groupEvent.getSender(), groupEvent.getMessage(), groupEvent.getGroup(),args.toArray(new String[0]));
-                groupEvent.getGroup().sendMessage(executeResult);
+                if (executeResult!=null){
+                    groupEvent.getGroup().sendMessage(executeResult);
+                }
             }
-
 
 
             //TODO 以下无指令头触发事件注册到BotEvent接口下实现
@@ -79,7 +84,9 @@ public class GroupMessageHandler extends SimpleListenerHost {
             }
             if (!matchesBili && !matchesV2 && message.startsWith("http")){
                 try {
-                    SeleniumUtil.screenshot(message,groupEvent.getGroup());
+                    InputStream inputStream = SeleniumUtil.screenshot(message);
+                    Image image = ExternalResource.uploadAsImage(inputStream, groupEvent.getGroup());
+                    groupEvent.getGroup().sendMessage(new MessageChainBuilder().append(image).build());
                 } catch (Exception e) {
                     groupEvent.getGroup().sendMessage("请检查地址链接是否正确");
                     e.printStackTrace();

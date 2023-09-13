@@ -14,8 +14,10 @@ import org.openqa.selenium.edge.EdgeOptions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.time.Duration;
 
 /**
@@ -41,7 +43,7 @@ public class SeleniumUtil {
         driver.manage().timeouts().implicitlyWait(Duration.ofMinutes(1));
     }
 
-    public static void screenshot(String message, Contact contact) throws InterruptedException, IOException {
+    public static InputStream screenshot(String message) throws InterruptedException, IOException {
         //获取要截图的地址，注：需要先获取地址哦，不然下方获取的宽度高度就会是弹窗的高和宽，而不是页面内容的高宽
         driver.get(message);
 
@@ -60,18 +62,10 @@ public class SeleniumUtil {
         //设置浏览器弹窗页面的大小
         driver.manage().window().setSize(new Dimension(width.intValue(), height.intValue()));
         //使用getScreenshotAs进行截取屏幕
-        File srcFile = driver.getScreenshotAs(OutputType.FILE);
-        File targetFile = new File("./Screen.png");
-        if (!targetFile.exists()){
-            targetFile.createNewFile();
-        }
-        FileUtil.copy(srcFile, targetFile,true);
-        //返回图片
-        ExternalResource ex = ExternalResource.Companion.create(FileUtil.readBytes(targetFile));
-        Image img = ExternalResource.uploadAsImage(ex,contact);
-        MessageChain sendMessage = new MessageChainBuilder().append(img).build();
-        contact.sendMessage(sendMessage);
+        byte[] screenshotBytes = driver.getScreenshotAs(OutputType.BYTES);
 
+        //还原窗口大小
         driver.manage().window().setSize(new Dimension(600,800));
+        return new ByteArrayInputStream(screenshotBytes);
     }
 }

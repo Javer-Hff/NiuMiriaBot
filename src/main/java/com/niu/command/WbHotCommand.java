@@ -49,20 +49,19 @@ public class WbHotCommand implements BotCommand {
     }
 
     @Override
-    public Message execute(Member sender, MessageChain messageChain, Contact contact) {
+    public Message execute(Member sender, MessageChain messageChain, Contact contact,String...args) {
         try{
-            if (messageChain.contentToString().contains(" ")){
-                String index = messageChain.contentToString().split(" ")[1];
-                WbHotObject wb = hotCache.getIfPresent(Integer.valueOf(index));
+            if (args!=null&&args.length>0){
+                WbHotObject wb = hotCache.getIfPresent(Integer.valueOf(args[0]));
                 if (wb==null){
                     hotCache.putAll(ApiUtil.getWbHot());
-                    wb = hotCache.getIfPresent(Integer.valueOf(index));
+                    wb = hotCache.getIfPresent(Integer.valueOf(args[0]));
                 }
                 if (wb==null){
                     throw new NumberFormatException();
                 }
-                SeleniumUtil.screenshot(wb.getUrl(),contact);
-                return null;
+                Image image = ExternalResource.uploadAsImage(SeleniumUtil.screenshot(wb.getUrl()), contact);
+                return new MessageChainBuilder().append(image).build();
             }
             if (hotCache.size()==0){
                 hotCache.putAll(ApiUtil.getWbHot());

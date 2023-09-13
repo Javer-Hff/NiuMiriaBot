@@ -1,6 +1,7 @@
 package com.niu.util;
 
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.util.URLUtil;
 import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
@@ -14,6 +15,7 @@ import net.mamoe.mirai.utils.ExternalResource;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import org.asynchttpclient.RequestBuilder;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -24,6 +26,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
+import java.net.URI;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -49,7 +53,7 @@ public class ApiUtil {
 
     private static final String V2EX_API = "https://www.v2ex.com/api/v2/topics/";
 
-    private static final String BA_API = "https://ba.gamekee.com";
+    private static final String BA_API = "https://ba.gamekee.com/v1/wiki/entry";
 
     private static final OkHttpClient HTTP_CLIENT = new OkHttpClient();
 
@@ -180,37 +184,28 @@ public class ApiUtil {
         }
     }
 
-
-    public static String getBAIntro(String level){
+    public static String getBaContentUrl(String level){
         try {
-            String href = baCache.get(level);
-            if (href!=null){
-                return href;
-            }
-            //refresh cache
-//            Request request = new Request.Builder().url(BA_API).get().build();
-//            Response response = HTTP_CLIENT.newCall(request).execute();
-//            String respStr = response.body().string();
-            InputStream stream = ApiUtil.class.getClassLoader().getResourceAsStream("ba.html");
-            String respStr = new String(stream.readAllBytes());
-            Document document = Jsoup.parse(respStr);
-            Element body = document.body();
-            baCache = body.getElementsByAttribute("data-v-72e1856c").stream().filter(element -> {
-                if (!element.hasAttr("href")) return false;
-                if (!element.hasAttr("class") || !element.attr("class").equals("item")) return false;
-                if (!element.hasAttr("title") || !element.attr("title").contains("-")) return false;
-                return true;
-            }).collect(Collectors.toMap((element -> element.attr("title")), (element -> element.attr("href"))));
-            href = baCache.get(level);
-            if (href ==null){
-                throw new RuntimeException("未找到关卡");
-            }else{
-                return href;
+            Response response = HTTP_CLIENT.newCall(new Request.Builder().url(BA_API).header("Game-Alias", "ba").get().build()).execute();
+            if (response.isSuccessful()){
+                JSONObject data = JSONUtil.parseObj(response.body().string()).getJSONObject("data");
+                JSONArray entryList = data.getJSONArray("entry_list");
+                Object levelObj = entryList.stream().filter(o -> JSONUtil.parseObj(o.toString()).getStr("name").equals("主线关卡")).findFirst().get();
+                JSONArray levelList = JSONUtil.parseObj(levelObj).getJSONArray("child");
+                if (level.contains("-")){
+                    String preLevel = level.split("-")[0];
+                    Object levelChildObj = levelList.stream().filter(o -> JSONUtil.parseObj(o).get("name").equals(preLevel + "章")).findFirst().get();
+                    Object contentObj = JSONUtil.parseArray(JSONUtil.parseObj(levelChildObj).getJSONArray("child")).stream().filter(o -> JSONUtil.parseObj(o).get("name").equals(level)).findFirst().get();
+                    Long contentId = JSONUtil.parseObj(contentObj).getLong("content_id");
+                    URI uri = URLUtil.getHost(new URL(BA_API));
+                    return uri.getScheme() + "://" + uri.getHost() + "/" + contentId + ".html";
+                }
+                //TODO 导览
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+        return null;
     }
-
 
 }
