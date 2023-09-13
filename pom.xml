@@ -76,6 +76,11 @@
             <version>2.5</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>27.0.1-jre</version>
+        </dependency>
 
         <!--html解析器-->
         <dependency>

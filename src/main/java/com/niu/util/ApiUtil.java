@@ -4,6 +4,7 @@ import cn.hutool.core.date.DateUtil;
 import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
+import com.niu.bean.WbHotObject;
 import net.mamoe.mirai.contact.Contact;
 import net.mamoe.mirai.message.data.Image;
 import net.mamoe.mirai.message.data.Message;
@@ -19,7 +20,6 @@ import org.jsoup.nodes.Element;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetSocketAddress;
@@ -62,27 +62,24 @@ public class ApiUtil {
         ApiUtil.v2Token = v2Token;
     }
 
-    public static HashMap<Integer,String> getWbHot(){
+    public static HashMap<Integer, WbHotObject> getWbHot(){
         Request request = new Request.Builder().url(WB_API).get().build();
         try {
             Response response = HTTP_CLIENT.newCall(request).execute();
             String respJson = response.body().string();
             JSONObject jsonObject = JSONUtil.parseObj(respJson);
             JSONArray dataArray = jsonObject.getJSONArray("data");
-            ArrayList<String> stringArrayList = new ArrayList<>();
-            HashMap<Integer,String> resultMap = new HashMap<>();
+            HashMap<Integer, WbHotObject> resultMap = new HashMap<>();
             int i = 1;
             for (Object o : dataArray) {
                 JSONObject element = JSONUtil.parseObj(o.toString());
                 String title = element.getStr("title");
                 String url = element.getStr("url");
                 String hot = element.getStr("hot");
-                stringArrayList.add(i+"."+title);
-                stringArrayList.add("热度:" + hot);
-                resultMap.put(i,url);
+                WbHotObject object = new WbHotObject(i,title,"热度:"+hot,url);
+                resultMap.put(i,object);
                 i++;
             }
-            SkikoUtil.drawTextLine(stringArrayList);
             return resultMap;
         } catch (IOException e) {
             throw new RuntimeException(e);
