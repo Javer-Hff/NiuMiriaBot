@@ -13,15 +13,22 @@ import net.mamoe.mirai.utils.ExternalResource;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * API接口工具类
@@ -42,7 +49,11 @@ public class ApiUtil {
 
     private static final String V2EX_API = "https://www.v2ex.com/api/v2/topics/";
 
+    private static final String BA_API = "https://ba.gamekee.com";
+
     private static final OkHttpClient HTTP_CLIENT = new OkHttpClient();
+
+    private static Map<String,String> baCache = new HashMap<>();
 
 
     private static String v2Token;
@@ -172,6 +183,37 @@ public class ApiUtil {
         }
     }
 
+
+    public static String getBAIntro(String level){
+        try {
+            String href = baCache.get(level);
+            if (href!=null){
+                return href;
+            }
+            //refresh cache
+//            Request request = new Request.Builder().url(BA_API).get().build();
+//            Response response = HTTP_CLIENT.newCall(request).execute();
+//            String respStr = response.body().string();
+            InputStream stream = ApiUtil.class.getClassLoader().getResourceAsStream("ba.html");
+            String respStr = new String(stream.readAllBytes());
+            Document document = Jsoup.parse(respStr);
+            Element body = document.body();
+            baCache = body.getElementsByAttribute("data-v-72e1856c").stream().filter(element -> {
+                if (!element.hasAttr("href")) return false;
+                if (!element.hasAttr("class") || !element.attr("class").equals("item")) return false;
+                if (!element.hasAttr("title") || !element.attr("title").contains("-")) return false;
+                return true;
+            }).collect(Collectors.toMap((element -> element.attr("title")), (element -> element.attr("href"))));
+            href = baCache.get(level);
+            if (href ==null){
+                throw new RuntimeException("未找到关卡");
+            }else{
+                return href;
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
 
 }
