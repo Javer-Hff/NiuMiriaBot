@@ -15,6 +15,8 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.regex.Pattern;
 
 /**
@@ -49,13 +51,13 @@ public class GroupMessageHandler extends SimpleListenerHost {
         boolean isListening = botConfig.getListeningGroup().contains(groupEvent.getGroup().getId());
         //是否在监听列表中
         if (isListening){
-            //获取消息内容以空格做拆分，空格前为指令，空格后为用户输入参数
-            //TODO 消息和指令间的拆分符写入配置文件，从配置中读取
+            //获取消息内容以配置中的分隔符做拆分，第一个为指令头，用于匹配，后续分割出的为指令参数
             String message = groupEvent.getMessage().contentToString();
-            String[] split = message.split(" ");
+            String[] split = message.split(botConfig.getSplit());
             BotCommand command = commandConfig.getCommand(split[0]);
             if (command!=null){
-                Message executeResult = command.execute(groupEvent.getSender(), groupEvent.getMessage(), groupEvent.getGroup());
+                List<String> args = Arrays.stream(split).skip(1).toList();
+                Message executeResult = command.execute(groupEvent.getSender(), groupEvent.getMessage(), groupEvent.getGroup(),args.toArray(new String[0]));
                 groupEvent.getGroup().sendMessage(executeResult);
             }
 

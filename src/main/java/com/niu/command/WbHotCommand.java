@@ -34,12 +34,11 @@ public class WbHotCommand implements BotCommand {
     }
 
     @Override
-    public Message execute(Member sender, MessageChain messageChain, Contact contact) {
+    public Message execute(Member sender, MessageChain messageChain, Contact contact,String...args) {
         MessageChainBuilder messageChainBuilder = new MessageChainBuilder();
-        if (messageChain.contentToString().contains(" ")){
-            String index = messageChain.contentToString().split(" ")[1];
+        if (args!=null&&args.length>0){
             try {
-                SeleniumUtil.screenshot(hotMap.get(Integer.valueOf(index)),contact);
+                SeleniumUtil.screenshot(hotMap.get(Integer.valueOf(args[0])),contact);
             } catch (InterruptedException | IOException e) {
                 throw new RuntimeException(e);
             }

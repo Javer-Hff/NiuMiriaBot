@@ -56,10 +56,9 @@ public class BorderlandCommand implements BotCommand {
     }
 
     @Override
-    public Message execute(Member sender, MessageChain messageChain, Contact contact) {
+    public Message execute(Member sender, MessageChain messageChain, Contact contact,String...args) {
         MessageChainBuilder messageChainBuilder = new MessageChainBuilder();
-        String findStr = messageChain.contentToString().split("red ")[1];
-        List<String> findResult = find(findStr);
+        List<String> findResult = find(args[0]);
         if (findResult!=null){
             messageChainBuilder.append("查询结果匹配以下红字:\n");
             for (String s : findResult) {
@@ -67,7 +66,7 @@ public class BorderlandCommand implements BotCommand {
             }
             return messageChainBuilder.build();
         }else {
-            return messageChainBuilder.append(borderlandsData.get(findStr)).build();
+            return messageChainBuilder.append(borderlandsData.get(args[0])).build();
         }
     }
 

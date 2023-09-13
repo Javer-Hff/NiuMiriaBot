@@ -28,7 +28,7 @@ public class NewsCommand implements BotCommand {
     }
 
     @Override
-    public Message execute(Member sender, MessageChain messageChain, Contact contact) {
+    public Message execute(Member sender, MessageChain messageChain, Contact contact,String...args) {
         MessageChainBuilder messageChainBuilder = new MessageChainBuilder();
         try {
             if (ImageDownloadUtil.downloadNews()){

@@ -27,14 +27,10 @@ public class DrawChoyenCommand implements BotCommand{
     }
 
     @Override
-    public Message execute(Member sender, MessageChain messageChain, Contact contact) {
-        String messageStr = messageChain.contentToString();
+    public Message execute(Member sender, MessageChain messageChain, Contact contact,String...args) {
         MessageChainBuilder messageChainBuilder = new MessageChainBuilder();
         try {
-            int commandStart = messageStr.indexOf(".choyen");
-            String arg = messageStr.substring(commandStart+8);
-            String[] split = arg.trim().split(" ");
-            if (SkikoUtil.drawChoyen(split[0],split[1])){
+            if (SkikoUtil.drawChoyen(args[0],args[1])){
                 ExternalResource externalResource = ExternalResource.create(new File("./draw-choyen.png"));
                 Image image = contact.uploadImage(externalResource);
                 externalResource.close();
