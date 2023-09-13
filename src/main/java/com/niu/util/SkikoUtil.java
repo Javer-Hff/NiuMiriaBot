@@ -244,7 +244,7 @@ public class SkikoUtil {
         return drawToImage(data,"draw-choyen.png");
     }
 
-    public static boolean drawTextLine(List<String> textList){
+    public static String drawTextLine(List<String> textList){
         Font font = new Font(Typeface.Companion.makeFromName("Cascadia Mono", FontStyle.Companion.getBOLD()), 50F);
 
         List<TextLine> textLineList = textList.stream().map(o -> TextLine.Companion.make(o, font)).toList();
@@ -268,7 +268,9 @@ public class SkikoUtil {
 
         Image image = surface.makeImageSnapshot();
         Data data = image.encodeToData(EncodedImageFormat.PNG, 100);
-        return drawToImage(data,"draw-text.png");
+        String fileName = "draw-text.png";
+        drawToImage(data,fileName);
+        return fileName;
     }
 
 
