@@ -4,6 +4,8 @@ import cn.hutool.json.JSONUtil;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -11,14 +13,22 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * 60s新闻速览图片下载工具
+ * 图片下载工具
  * @authoer:hff
  * @Date 2023/8/2 16:29
  */
+@Component
 public class ImageDownloadUtil {
     private static final String NEWS_API = "http://dwz.2xb.cn/zaob";
 
     private static final String MOYU_API ="https://api.vvhan.com/api/moyu?type=json";
+
+
+    private static String workDir;
+    @Value("${bot.workdir}")
+    public void setWorkDir(String workDir){
+        ImageDownloadUtil.workDir = workDir;
+    }
 
     public static boolean downloadNews(){
         try{
@@ -55,7 +65,7 @@ public class ImageDownloadUtil {
     }
 
     private static void downloadImage(String fileName, String downloadUrl) throws IOException {
-        File file = new File("./" + fileName);
+        File file = new File(workDir + fileName);
         file.deleteOnExit();
         InputStream byteStream = null;
         FileOutputStream fileOutputStream = null;

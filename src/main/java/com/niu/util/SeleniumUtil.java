@@ -30,13 +30,13 @@ public class SeleniumUtil {
     private static EdgeDriver driver;
 
     static {
-        //配置本地的chromediver.exe谷歌的内核
+        //配置本地的msedgedriver.exe的edge浏览器内核
         System.setProperty("webdriver.edge.driver", "C:\\Users\\wxhld\\Downloads\\edgedriver_win64\\msedgedriver.exe");
-        //设置ChromeOptions打开方式，设置headless：不弹出浏览器
+        //设置EdgeOptions打开方式，设置headless：无头模式(不弹出浏览器)
         EdgeOptions options = new EdgeOptions();
         options.addArguments("headless");
         options.addArguments("--remote-allow-origins=*");
-        //设置好使用ChromeDriver使用
+
         driver = new EdgeDriver(options);
         driver.manage().timeouts().scriptTimeout(Duration.ofMinutes(1));
         driver.manage().timeouts().pageLoadTimeout(Duration.ofMinutes(1));
@@ -55,10 +55,7 @@ public class SeleniumUtil {
         //获取页面高宽使用：return document.documentElement.scrollWidth
         Long width = (Long) ((JavascriptExecutor)driver).executeScript("return document.documentElement.scrollWidth");
         Long height = (Long) ((JavascriptExecutor)driver).executeScript("return document.documentElement.scrollHeight");
-        System.out.println("========================");
-        System.out.println(width);
-        System.out.println(height);
-        System.out.println("========================");
+
         //设置浏览器弹窗页面的大小
         driver.manage().window().setSize(new Dimension(width.intValue(), height.intValue()));
         //使用getScreenshotAs进行截取屏幕

@@ -66,7 +66,7 @@ public class BotRunner implements CommandLineRunner  {
 
         BotConfiguration config = new BotConfiguration(){
             {   //登录指纹存储本地文件，避免每次登录校验
-                fileBasedDeviceInfo("deviceInfo.json");
+                fileBasedDeviceInfo(botConfig.getWorkdir() + "deviceInfo.json");
                 setProtocol(MiraiProtocol.valueOf(botConfig.getProtocol()));
             }
         };
