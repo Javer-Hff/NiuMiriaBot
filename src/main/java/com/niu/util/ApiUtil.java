@@ -67,9 +67,8 @@ public class ApiUtil {
     }
 
     public static HashMap<Integer, WbHotObject> getWbHot(){
-        Request request = new Request.Builder().url(WB_API).get().build();
         try {
-            Response response = HTTP_CLIENT.newCall(request).execute();
+            Response response = HttpRequestUtil.builder().get(WB_API);
             String respJson = response.body().string();
             JSONObject jsonObject = JSONUtil.parseObj(respJson);
             JSONArray dataArray = jsonObject.getJSONArray("data");
@@ -91,12 +90,14 @@ public class ApiUtil {
     }
 
     public static Message getBiliVideoInfo(String videoId, Contact contact){
+        HttpRequestUtil requestUtil = HttpRequestUtil.builder();
         String lowerCaseId = videoId.toLowerCase();
-        String requestParam = lowerCaseId.startsWith("bv")?"bvid=" + videoId:"aid=" + videoId.replace("av","")
-                .replace("AV","");
-        Request request = new Request.Builder().url(BILI_API + "?" + requestParam).build();
+        requestUtil = lowerCaseId.startsWith("bv") ?
+                requestUtil.setParam("bvid", videoId)
+                : requestUtil.setParam("aid", videoId.replace("av", "")
+                .replace("AV", ""));
         try {
-            Response response = HTTP_CLIENT.newCall(request).execute();
+            Response response = requestUtil.get(BILI_API);
             if (response.isSuccessful()&&response.body()!=null){
                 String jsonString = response.body().string();
                 JSONObject responseBody = JSONUtil.parseObj(jsonString);
@@ -154,12 +155,9 @@ public class ApiUtil {
             message = message.substring(0,message.indexOf("#"));
         }
         try {
-            //TODO 代理地址加入配置文件
-            Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress("127.0.0.1", 7890));
-            OkHttpClient okHttpClient = new OkHttpClient.Builder().proxy(proxy).build();
-            Request request = new Request.Builder().url(V2EX_API + message)
-                    .get().header("Authorization","Bearer " + v2Token).build();
-            Response response = okHttpClient.newCall(request).execute();
+            Response response = HttpRequestUtil.builder()
+                    .setHeader("Authorization", "Bearer " + v2Token)
+                    .get(V2EX_API + message);
             String respStr = response.body().string();
             JSONObject result = JSONUtil.parseObj(respStr).getJSONObject("result");
             String title = result.getStr("title");
@@ -186,7 +184,7 @@ public class ApiUtil {
 
     public static String getBaContentUrl(String level){
         try {
-            Response response = HTTP_CLIENT.newCall(new Request.Builder().url(BA_API).header("Game-Alias", "ba").get().build()).execute();
+            Response response = HttpRequestUtil.builder().setHeader("Game-Alias", "ba").get(BA_API);
             if (response.isSuccessful()){
                 JSONObject data = JSONUtil.parseObj(response.body().string()).getJSONObject("data");
                 JSONArray entryList = data.getJSONArray("entry_list");

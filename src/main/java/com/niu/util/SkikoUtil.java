@@ -14,7 +14,6 @@ import java.util.Objects;
  * @Date 2023/8/28 15:26
  */
 public class SkikoUtil {
-
     public static boolean drawPornHub(String pre,String suf){
         //字体从系统字体种按名称匹配，匹配不到则使用系统默认字体
         Font font = new Font(Typeface.Companion.makeFromName("Cascadia Mono", FontStyle.Companion.getBOLD()), 100F);
@@ -272,7 +271,6 @@ public class SkikoUtil {
         drawToImage(data,fileName);
         return fileName;
     }
-
 
     public static boolean drawToImage(Data data,String fileName){
         byte[] bytes = data.getBytes();
