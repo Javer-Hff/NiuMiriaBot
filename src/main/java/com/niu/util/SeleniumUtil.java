@@ -1,6 +1,8 @@
 package com.niu.util;
 
 import cn.hutool.core.io.FileUtil;
+import com.niu.config.BotConfig;
+import jakarta.annotation.PostConstruct;
 import net.mamoe.mirai.contact.Contact;
 import net.mamoe.mirai.message.data.Image;
 import net.mamoe.mirai.message.data.MessageChain;
@@ -13,6 +15,8 @@ import org.openqa.selenium.edge.EdgeDriver;
 import org.openqa.selenium.edge.EdgeOptions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -26,12 +30,17 @@ import java.time.Duration;
  * @authoer:hff
  * @Date 2023/9/4 14:35
  */
+@Component
 public class SeleniumUtil {
     private static EdgeDriver driver;
 
-    static {
+    @Autowired
+    public BotConfig botConfig;
+
+    @PostConstruct
+    private void init(){
         //配置本地的msedgedriver.exe的edge浏览器内核
-        System.setProperty("webdriver.edge.driver", "C:\\Users\\wxhld\\Downloads\\edgedriver_win64\\msedgedriver.exe");
+        System.setProperty("webdriver.edge.driver", botConfig.getWorkdir() + "msedgedriver.exe");
         //设置EdgeOptions打开方式，设置headless：无头模式(不弹出浏览器)
         EdgeOptions options = new EdgeOptions();
         options.addArguments("headless");

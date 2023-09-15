@@ -27,5 +27,6 @@ replay_pid*
 cache/
 *.png
 *.jpg
+android_pad.json
 deviceInfo.json
 src/main/resources/application-local.yml
