@@ -88,10 +88,12 @@ public class GroupMessageHandler extends SimpleListenerHost {
             }
             if (!matchesBili && !matchesV2 && message.startsWith("http")){
                 try {
-                    for (String block : blackListConfig.getWebSite()) {
-                        if (message.contains(block)){
-                            groupEvent.getGroup().sendMessage(blackListConfig.getReturnWords());
-                            return ListeningStatus.LISTENING;
+                    if (blackListConfig!=null){
+                        for (String block : blackListConfig.getWebSite()) {
+                            if (message.contains(block)){
+                                groupEvent.getGroup().sendMessage(blackListConfig.getReturnWords());
+                                return ListeningStatus.LISTENING;
+                            }
                         }
                     }
                     InputStream inputStream = SeleniumUtil.screenshot(message);
