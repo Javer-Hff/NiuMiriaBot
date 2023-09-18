@@ -24,7 +24,7 @@ public class NewsCommand implements BotCommand {
 
     @Override
     public String command() {
-        return ".60s";
+        return "60s";
     }
 
     @Override

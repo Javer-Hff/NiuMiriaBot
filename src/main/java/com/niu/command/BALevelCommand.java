@@ -22,7 +22,7 @@ import java.io.InputStream;
 public class BALevelCommand implements BotCommand {
     @Override
     public String command() {
-        return ".怎么过";
+        return "怎么过";
     }
 
     @Override

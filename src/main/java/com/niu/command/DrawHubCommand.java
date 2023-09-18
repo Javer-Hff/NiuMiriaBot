@@ -24,7 +24,7 @@ public class DrawHubCommand implements BotCommand{
 
     @Override
     public String command() {
-        return ".porn";
+        return "porn";
     }
 
     @Override

@@ -23,7 +23,7 @@ import java.io.File;
 public class DrawChoyenCommand implements BotCommand{
     @Override
     public String command() {
-        return ".choyen";
+        return "choyen";
     }
 
     @Override
