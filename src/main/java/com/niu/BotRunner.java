@@ -78,8 +78,8 @@ public class BotRunner implements CommandLineRunner  {
         //注册事件监听器
         bot.getEventChannel().registerListenerHost(groupMessageHandler);
         //注册指令
-        Map<String, Object> commands = applicationContext.getBeansWithAnnotation(Command.class);
-        commands.values().forEach(o->commandConfig.registerCommand((BotCommand) o));
+        Map<String, BotCommand> commands = applicationContext.getBeansOfType(BotCommand.class);
+        commands.values().forEach(o->commandConfig.registerCommand(o));
 
         bot.login();
 
