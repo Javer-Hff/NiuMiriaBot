@@ -37,12 +37,16 @@ public class HttpRequestUtil {
     private Map<String, String> headerMap;
     @Value("${bot.proxy.host}")
     public void setProxyHost(String proxyHost){
-        HttpRequestUtil.proxyHost = proxyHost;
+        if (!proxyHost.trim().isEmpty()){
+            HttpRequestUtil.proxyHost = proxyHost;
+        }
     }
 
     @Value("${bot.proxy.port}")
     public void setProxyPort(int proxyPort){
-        HttpRequestUtil.proxyPort = proxyPort;
+        if (proxyPort>0){
+            HttpRequestUtil.proxyPort = proxyPort;
+        }
     }
 
 

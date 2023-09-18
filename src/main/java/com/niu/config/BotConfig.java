@@ -29,11 +29,11 @@ public class BotConfig {
     //命令参数分隔符
     private String split;
     //代理IP
-    @Value("${bot.proxy.host}")
-    private String host;
-    //代理端口
-    @Value("${bot.proxy.port}")
-    private int port;
+//    @Value("${bot.proxy.host}")
+//    private String host;
+//    //代理端口
+//    @Value("${bot.proxy.port}")
+//    private int port;
     //监听群组列表
     private List<Long> listeningGroup;
 }

@@ -45,7 +45,7 @@ public class WbHotCommand implements BotCommand {
 
     @Override
     public String command() {
-        return ".hot";
+        return "wbhot";
     }
 
     @Override

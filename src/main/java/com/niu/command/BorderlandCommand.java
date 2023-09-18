@@ -52,7 +52,7 @@ public class BorderlandCommand implements BotCommand {
 
     @Override
     public String command() {
-        return ".red";
+        return "red";
     }
 
     @Override

@@ -3,6 +3,7 @@ package com.niu.task;
 import com.niu.BotRunner;
 import com.niu.util.ImageDownloadUtil;
 import net.mamoe.mirai.Bot;
+import net.mamoe.mirai.contact.ContactList;
 import net.mamoe.mirai.contact.Group;
 import net.mamoe.mirai.message.data.Image;
 import net.mamoe.mirai.message.data.MessageChain;
@@ -14,6 +15,9 @@ import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.time.DayOfWeek;
+import java.time.LocalDateTime;
 
 /**
  * 新闻推送定时任务
@@ -24,7 +28,7 @@ import java.io.IOException;
 @EnableScheduling
 public class BotTask {
 
-    @Scheduled(cron = "0 30 9 * * ?")
+    @Scheduled(cron = "0 0 8 * * ?")
     public void sendNews(){
         try {
             ImageDownloadUtil.downloadNews();
@@ -41,7 +45,7 @@ public class BotTask {
         }
     }
 
-    @Scheduled(cron = "0 20 14 * * ?")
+    @Scheduled(cron = "0 30 13 * * ?")
     public void sendCalendar(){
         try {
             if (ImageDownloadUtil.downloadMoyu()){
@@ -60,4 +64,22 @@ public class BotTask {
             throw new RuntimeException(e);
         }
     }
+
+    @Scheduled(cron = "0 0 7 * * ?")
+    public void dayCalendar() throws IOException {
+        Bot bot = BotRunner.getBot();
+        ContactList<Group> groups = bot.getGroups();
+        DayOfWeek day = LocalDateTime.now().getDayOfWeek();
+        InputStream stream = this.getClass().getClassLoader().getResourceAsStream("image/day/" + day.getValue() + ".jpg");
+        ExternalResource resource = ExternalResource.create(stream, "jpg");
+        for (Group group : groups) {
+            Image image = group.uploadImage(resource);
+            MessageChain messages = new MessageChainBuilder().append(image).build();
+            group.sendMessage(messages);
+        }
+        resource.close();
+    }
+
+
+
 }
