@@ -182,7 +182,7 @@ public class ApiUtil {
         }
     }
 
-    public static String getBaContentUrl(String level){
+    public static String getBaContentUrl(final String level){
         try {
             Response response = HttpRequestUtil.builder().setHeader("Game-Alias", "ba").get(BA_API);
             if (response.isSuccessful()){
@@ -192,7 +192,11 @@ public class ApiUtil {
                 JSONArray levelList = JSONUtil.parseObj(levelObj).getJSONArray("child");
                 if (level.contains("-")){
                     String preLevel = level.split("-")[0];
-                    Object levelChildObj = levelList.stream().filter(o -> JSONUtil.parseObj(o).get("name").equals(preLevel + "章")).findFirst().get();
+                    if (preLevel.contains("H")){
+                        preLevel = preLevel.replace("H","");
+                    }
+                    final String pre = preLevel;
+                    Object levelChildObj = levelList.stream().filter(o -> JSONUtil.parseObj(o).get("name").equals(pre + "章")).findFirst().get();
                     Object contentObj = JSONUtil.parseArray(JSONUtil.parseObj(levelChildObj).getJSONArray("child")).stream().filter(o -> JSONUtil.parseObj(o).get("name").equals(level)).findFirst().get();
                     Long contentId = JSONUtil.parseObj(contentObj).getLong("content_id");
                     URI uri = URLUtil.getHost(new URL(BA_API));
