@@ -86,8 +86,9 @@ public class GroupMessageHandler extends SimpleListenerHost {
                 if (inputStream!=null){
                     Image image = ExternalResource.uploadAsImage(inputStream, groupEvent.getGroup());
                     groupEvent.getGroup().sendMessage(new MessageChainBuilder().append(image).build());
+                }else {
+                    groupEvent.getGroup().sendMessage(new MessageChainBuilder().append("啊？").build());
                 }
-                groupEvent.getGroup().sendMessage(new MessageChainBuilder().append("啊？").build());
             } catch (Exception e) {
                 groupEvent.getGroup().sendMessage("请检查地址链接是否正确");
                 e.printStackTrace();
