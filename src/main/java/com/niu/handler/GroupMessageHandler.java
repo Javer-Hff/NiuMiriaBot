@@ -1,6 +1,7 @@
 package com.niu.handler;
 
 import com.niu.command.BotCommand;
+import com.niu.config.BlackListConfig;
 import com.niu.config.BotConfig;
 import com.niu.config.CommandConfig;
 import com.niu.util.ApiUtil;
@@ -36,6 +37,9 @@ public class GroupMessageHandler extends SimpleListenerHost {
 
     @Autowired
     private CommandConfig commandConfig;
+
+    @Autowired
+    public BlackListConfig blackListConfig;
 
     private static final String MATCH_PREFIX1 = "https://v2ex.com/t/";
     private static final String MATCH_PREFIX2 = "https://www.v2ex.com/t/";
@@ -81,13 +85,21 @@ public class GroupMessageHandler extends SimpleListenerHost {
             groupEvent.getGroup().sendMessage(ApiUtil.getV2TopicInfo(message));
         }
         if (!matchesBili && !matchesV2 && message.startsWith("http")){
+                for (String block : blackListConfig.getWebSite()) {
+                    if (message.contains(block)){
+                        groupEvent.getGroup().sendMessage(blackListConfig.getReturnWords());
+                        return ListeningStatus.LISTENING;
+                    }
+                }
             try {
                 InputStream inputStream = SeleniumUtil.screenshot(message);
                 if (inputStream!=null){
                     Image image = ExternalResource.uploadAsImage(inputStream, groupEvent.getGroup());
                     groupEvent.getGroup().sendMessage(new MessageChainBuilder().append(image).build());
+                    return ListeningStatus.LISTENING;
                 }else {
                     groupEvent.getGroup().sendMessage(new MessageChainBuilder().append("啊？").build());
+                    return ListeningStatus.LISTENING;
                 }
             } catch (Exception e) {
                 groupEvent.getGroup().sendMessage("请检查地址链接是否正确");
