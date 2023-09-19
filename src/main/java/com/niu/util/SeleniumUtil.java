@@ -59,7 +59,7 @@ public class SeleniumUtil {
     }
 
     public static InputStream screenshot(String message) throws InterruptedException, IOException {
-        if (!urlsec(message)){
+        if (urlsec(message)){
             return null;
         }
         //获取要截图的地址，注：需要先获取地址哦，不然下方获取的宽度高度就会是弹窗的高和宽，而不是页面内容的高宽
