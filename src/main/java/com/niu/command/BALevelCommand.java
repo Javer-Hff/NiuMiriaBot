@@ -31,8 +31,12 @@ public class BALevelCommand implements BotCommand {
         String baContentUrl = ApiUtil.getBaContentUrl(arg);
         try {
             InputStream inputStream = SeleniumUtil.screenshot(baContentUrl);
-            Image image = ExternalResource.uploadAsImage(inputStream, contact);
-            return new MessageChainBuilder().append(image).build();
+            if (inputStream!=null){
+                Image image = ExternalResource.uploadAsImage(inputStream, contact);
+                inputStream.close();
+                return new MessageChainBuilder().append(image).build();
+            }
+            return new MessageChainBuilder().append("啊？").build();
         } catch (InterruptedException | IOException e) {
             throw new RuntimeException(e);
         }

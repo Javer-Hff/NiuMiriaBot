@@ -17,7 +17,6 @@ public interface BotCommand {
 
 
     //触发指令的回调
-    //TODO 添加可变参数用于处理带参指令
     public Message execute(Member sender, MessageChain messageChain, Contact contact, String...args);
 
 }

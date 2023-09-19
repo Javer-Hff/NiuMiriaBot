@@ -53,44 +53,44 @@ public class GroupMessageHandler extends SimpleListenerHost {
     @EventHandler
     public ListeningStatus onMessage(@NotNull GroupMessageEvent groupEvent) {
         boolean isListening = botConfig.getListeningGroup().contains(groupEvent.getGroup().getId());
-        //是否在监听列表中
-        if (isListening){
-            //获取消息内容以配置中的分隔符做拆分，第一个为指令头，用于匹配，后续分割出的为指令参数
-            String message = groupEvent.getMessage().contentToString();
-            String[] split = message.split(botConfig.getSplit());
-            BotCommand command = commandConfig.getCommand(split[0]);
-            if (command!=null){
-                List<String> args = Arrays.stream(split).skip(1).toList();
-                Message executeResult = command.execute(groupEvent.getSender(), groupEvent.getMessage(), groupEvent.getGroup(),args.toArray(new String[0]));
-                if (executeResult!=null){
-                    groupEvent.getGroup().sendMessage(executeResult);
-                }
+        //获取消息内容以配置中的分隔符做拆分，第一个为指令头，用于匹配，后续分割出的为指令参数
+        String message = groupEvent.getMessage().contentToString();
+        String[] split = message.split(botConfig.getSplit());
+        BotCommand command = commandConfig.getCommand(split[0]);
+        if (command!=null){
+            List<String> args = Arrays.stream(split).skip(1).toList();
+            Message executeResult = command.execute(groupEvent.getSender(), groupEvent.getMessage(), groupEvent.getGroup(),args.toArray(new String[0]));
+            if (executeResult!=null){
+                groupEvent.getGroup().sendMessage(executeResult);
             }
+        }
 
 
-            //TODO 以下无指令头触发事件注册到BotEvent接口下实现
-            //正则匹配bibiURL
-            boolean matchesBili = Pattern.matches("^(?i)[ba]v\\d+[a-zA-Z\\d]+$", message);
-            if (matchesBili){
-                Message videoInfo = ApiUtil.getBiliVideoInfo(message,groupEvent.getGroup());
-                if (videoInfo!=null){
-                    groupEvent.getGroup().sendMessage(videoInfo);
-                }
+        //TODO 以下无指令头触发事件注册到BotEvent接口下实现
+        //正则匹配bibiURL
+        boolean matchesBili = Pattern.matches("^(?i)[ba]v\\d+[a-zA-Z\\d]+$", message);
+        if (matchesBili){
+            Message videoInfo = ApiUtil.getBiliVideoInfo(message,groupEvent.getGroup());
+            if (videoInfo!=null){
+                groupEvent.getGroup().sendMessage(videoInfo);
             }
-            //V2ex
-            boolean matchesV2 = message.startsWith(MATCH_PREFIX1) || message.startsWith(MATCH_PREFIX2);
-            if (matchesV2){
-                groupEvent.getGroup().sendMessage(ApiUtil.getV2TopicInfo(message));
-            }
-            if (!matchesBili && !matchesV2 && message.startsWith("http")){
-                try {
-                    InputStream inputStream = SeleniumUtil.screenshot(message);
+        }
+        //V2ex
+        boolean matchesV2 = message.startsWith(MATCH_PREFIX1) || message.startsWith(MATCH_PREFIX2);
+        if (matchesV2){
+            groupEvent.getGroup().sendMessage(ApiUtil.getV2TopicInfo(message));
+        }
+        if (!matchesBili && !matchesV2 && message.startsWith("http")){
+            try {
+                InputStream inputStream = SeleniumUtil.screenshot(message);
+                if (inputStream!=null){
                     Image image = ExternalResource.uploadAsImage(inputStream, groupEvent.getGroup());
                     groupEvent.getGroup().sendMessage(new MessageChainBuilder().append(image).build());
-                } catch (Exception e) {
-                    groupEvent.getGroup().sendMessage("请检查地址链接是否正确");
-                    e.printStackTrace();
                 }
+                groupEvent.getGroup().sendMessage(new MessageChainBuilder().append("啊？").build());
+            } catch (Exception e) {
+                groupEvent.getGroup().sendMessage("请检查地址链接是否正确");
+                e.printStackTrace();
             }
         }
         return ListeningStatus.LISTENING;
