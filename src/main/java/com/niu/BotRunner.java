@@ -7,6 +7,8 @@ import com.niu.config.CommandConfig;
 import com.niu.handler.GroupMessageHandler;
 import net.mamoe.mirai.Bot;
 import net.mamoe.mirai.BotFactory;
+import net.mamoe.mirai.event.events.BotEvent;
+import net.mamoe.mirai.event.events.GroupEvent;
 import net.mamoe.mirai.internal.spi.EncryptService;
 import net.mamoe.mirai.utils.BotConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,9 +47,7 @@ public class BotRunner implements CommandLineRunner  {
 
     @Override
     public void run(String... args) throws Exception {
-
         //登录热修
-
 //        获取 8.9.63 版本协议
 //        FixProtocolVersion.fetch(BotConfiguration.MiraiProtocol.ANDROID_PHONE, "8.9.63");
         //从本地加载协议文件

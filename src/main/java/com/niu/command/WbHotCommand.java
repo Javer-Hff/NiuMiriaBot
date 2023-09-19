@@ -19,6 +19,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
@@ -60,8 +61,12 @@ public class WbHotCommand implements BotCommand {
                 if (wb==null){
                     throw new NumberFormatException();
                 }
-                Image image = ExternalResource.uploadAsImage(SeleniumUtil.screenshot(wb.getUrl()), contact);
-                return new MessageChainBuilder().append(image).build();
+                InputStream inputStream = SeleniumUtil.screenshot(wb.getUrl());
+                if (inputStream!=null){
+                    Image image = ExternalResource.uploadAsImage(inputStream, contact);
+                    return new MessageChainBuilder().append(image).build();
+                }
+                return new MessageChainBuilder().append("啊？").build();
             }
             if (hotCache.size()==0){
                 hotCache.putAll(ApiUtil.getWbHot());

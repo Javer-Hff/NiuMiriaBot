@@ -1,6 +1,9 @@
 package com.niu.util;
 
 import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.net.URLEncodeUtil;
+import cn.hutool.json.JSONObject;
+import cn.hutool.json.JSONUtil;
 import com.niu.config.BotConfig;
 import jakarta.annotation.PostConstruct;
 import net.mamoe.mirai.contact.Contact;
@@ -23,6 +26,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.Duration;
+import java.util.Set;
 
 /**
  * TODO
@@ -33,6 +37,8 @@ import java.time.Duration;
 @Component
 public class SeleniumUtil {
     private static EdgeDriver driver;
+
+    private static final String TENCENT_URL_SEC = "https://api.kit9.cn/api/tencent_security/api.php?url=";
 
     @Autowired
     public BotConfig botConfig;
@@ -53,6 +59,9 @@ public class SeleniumUtil {
     }
 
     public static InputStream screenshot(String message) throws InterruptedException, IOException {
+        if (!urlsec(message)){
+            return null;
+        }
         //获取要截图的地址，注：需要先获取地址哦，不然下方获取的宽度高度就会是弹窗的高和宽，而不是页面内容的高宽
         driver.get(message);
 
@@ -70,8 +79,35 @@ public class SeleniumUtil {
         //使用getScreenshotAs进行截取屏幕
         byte[] screenshotBytes = driver.getScreenshotAs(OutputType.BYTES);
 
+        //打开新的标签页关闭当前标签页
+        String currentWindow = driver.getWindowHandle();
+        Set<String> windowHandles = driver.getWindowHandles();
+        for (String windowHandle : windowHandles) {
+            if (!windowHandle.equals(currentWindow)){
+                driver.switchTo().window(windowHandle).close();
+            }
+        }
+        driver.switchTo().window(currentWindow);
+
         //还原窗口大小
         driver.manage().window().setSize(new Dimension(600,800));
         return new ByteArrayInputStream(screenshotBytes);
+    }
+
+    //腾讯网址安全中心https://urlsec.qq.com/check.html
+    //腾讯域名检测
+    public static boolean urlsec(String url){
+        String requestUrl = TENCENT_URL_SEC + url;
+        try {
+            String bodyString = HttpRequestUtil.builder().get(requestUrl).body().string();
+            JSONObject data = JSONUtil.parseObj(bodyString).getJSONObject("data");
+            Integer state = data.getInt("state");
+            if (state==2){
+                return false;
+            }
+            return true;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
