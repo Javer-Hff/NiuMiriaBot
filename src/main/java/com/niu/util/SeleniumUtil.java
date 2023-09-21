@@ -83,15 +83,8 @@ public class SeleniumUtil {
         //使用getScreenshotAs进行截取屏幕
         byte[] screenshotBytes = driver.getScreenshotAs(OutputType.BYTES);
 
-        //打开新的标签页关闭当前标签页
-        String currentWindow = driver.getWindowHandle();
-        Set<String> windowHandles = driver.getWindowHandles();
-        for (String windowHandle : windowHandles) {
-            if (!windowHandle.equals(currentWindow)){
-                driver.switchTo().window(windowHandle).close();
-            }
-        }
-        driver.switchTo().window(currentWindow);
+        //打开空白页
+        driver.get("about:blank");
 
         //还原窗口大小
         driver.manage().window().setSize(new Dimension(600,800));
