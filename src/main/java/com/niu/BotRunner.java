@@ -15,20 +15,23 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
+import top.mrxiaom.qsign.QSignService;
 import xyz.cssxsh.mirai.tool.FixProtocolVersion;
 import xyz.cssxsh.mirai.tool.KFCFactory;
 
+import java.io.File;
 import java.util.List;
 import java.util.Map;
 import java.util.ServiceLoader;
 
 /**
  * Bot启动类
+ *
  * @authoer:hff
  * @Date 2023/8/1 9:08
  */
 @Component
-public class BotRunner implements CommandLineRunner  {
+public class BotRunner implements CommandLineRunner {
     @Autowired
     private BotConfig botConfig;
     @Autowired
@@ -47,15 +50,10 @@ public class BotRunner implements CommandLineRunner  {
 
     @Override
     public void run(String... args) throws Exception {
-        //登录热修
-//        获取 8.9.63 版本协议
-//        FixProtocolVersion.fetch(BotConfiguration.MiraiProtocol.ANDROID_PHONE, "8.9.63");
-        //从本地加载协议文件
-        FixProtocolVersion.load(BotConfiguration.MiraiProtocol.valueOf(botConfig.getProtocol()));
-        //Spi加载
-        ServiceLoader.load(EncryptService.class);
-        ServiceLoader.load(EncryptService.Factory.class);
-        KFCFactory.install();
+        // 加载签名服务
+        QSignService.Factory.init(new File("txlib/8.9.70"));
+        QSignService.Factory.loadProtocols(null);
+        QSignService.Factory.register();
 
         System.out.println(">>>>>>>>>>start>>>>>>>>>>");
 
@@ -64,22 +62,19 @@ public class BotRunner implements CommandLineRunner  {
             System.out.println("listening group:" + groupId);
         }
 
-        BotConfiguration config = new BotConfiguration(){
+        BotConfiguration config = new BotConfiguration() {
             {   //登录指纹存储本地文件，避免每次登录校验
                 fileBasedDeviceInfo(botConfig.getWorkdir() + "deviceInfo.json");
                 setProtocol(MiraiProtocol.valueOf(botConfig.getProtocol()));
             }
         };
 
-        FixProtocolVersion.sync(BotConfiguration.MiraiProtocol.valueOf(botConfig.getProtocol()));
-//        //登录方式为扫码
-//        bot = BotFactory.INSTANCE.newBot(botConfig.getQq(), BotAuthorization.byQRCode(),config);
-        bot = BotFactory.INSTANCE.newBot(botConfig.getQq(),botConfig.getPassword(),config);
+        bot = BotFactory.INSTANCE.newBot(botConfig.getQq(), botConfig.getPassword(), config);
         //注册事件监听器
         bot.getEventChannel().registerListenerHost(groupMessageHandler);
         //注册指令
         Map<String, BotCommand> commands = applicationContext.getBeansOfType(BotCommand.class);
-        commands.values().forEach(o->commandConfig.registerCommand(o));
+        commands.values().forEach(o -> commandConfig.registerCommand(o));
 
         bot.login();
 
