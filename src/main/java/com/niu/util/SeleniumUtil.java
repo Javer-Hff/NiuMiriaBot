@@ -1,16 +1,11 @@
 package com.niu.util;
 
-import cn.hutool.core.io.FileUtil;
-import cn.hutool.core.net.URLEncodeUtil;
+
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.niu.config.BotConfig;
 import jakarta.annotation.PostConstruct;
-import net.mamoe.mirai.contact.Contact;
-import net.mamoe.mirai.message.data.Image;
-import net.mamoe.mirai.message.data.MessageChain;
-import net.mamoe.mirai.message.data.MessageChainBuilder;
-import net.mamoe.mirai.utils.ExternalResource;
+import jakarta.annotation.PreDestroy;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.OutputType;
@@ -22,7 +17,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.Duration;
@@ -46,6 +40,7 @@ public class SeleniumUtil {
     @PostConstruct
     private void init(){
         //配置本地的msedgedriver.exe的edge浏览器内核
+        //TODO 根据系统匹配driver
         System.setProperty("webdriver.edge.driver", botConfig.getWorkdir() + "msedgedriver.exe");
         //设置EdgeOptions打开方式，设置headless：无头模式(不弹出浏览器)
         EdgeOptions options = new EdgeOptions();
@@ -56,6 +51,15 @@ public class SeleniumUtil {
         driver.manage().timeouts().scriptTimeout(Duration.ofMinutes(1));
         driver.manage().timeouts().pageLoadTimeout(Duration.ofMinutes(1));
         driver.manage().timeouts().implicitlyWait(Duration.ofMinutes(1));
+    }
+
+    @PreDestroy
+    private void closeDriver(){
+        try {
+            driver.quit();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     public static InputStream screenshot(String message) throws InterruptedException, IOException {
