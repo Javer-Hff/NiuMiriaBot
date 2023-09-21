@@ -15,3 +15,4 @@ bot:
     host: localhost
     port: 7890
   split: ' '
+  commandHeads:

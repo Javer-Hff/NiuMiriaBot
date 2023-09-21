@@ -1,4 +1,4 @@
-package com.niu.anno;
+package com.niu.core.anno;
 
 import org.springframework.stereotype.Component;
 
@@ -6,6 +6,7 @@ import java.lang.annotation.*;
 
 /**
  * 指令类标记注解
+ *
  * @authoer:hff
  * @Date 2023/8/2 10:12
  */
@@ -13,7 +14,6 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Inherited
 @Component
-@Deprecated
 public @interface Command {
-
+    String[] name();
 }
