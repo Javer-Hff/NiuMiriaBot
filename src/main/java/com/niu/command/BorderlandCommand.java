@@ -1,9 +1,10 @@
 package com.niu.command;
 
-import com.niu.anno.Command;
+import com.niu.core.command.AnyCommand;
+import com.niu.core.anno.Command;
 import jakarta.annotation.PostConstruct;
 import net.mamoe.mirai.contact.Contact;
-import net.mamoe.mirai.contact.Member;
+import net.mamoe.mirai.contact.User;
 import net.mamoe.mirai.message.data.Message;
 import net.mamoe.mirai.message.data.MessageChain;
 import net.mamoe.mirai.message.data.MessageChainBuilder;
@@ -11,7 +12,6 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -22,15 +22,14 @@ import java.util.regex.Pattern;
 
 /**
  * 无主之地3 红字查询
+ *
  * @authoer:hff
  * @Date 2023/8/2 14:23
  */
-@Command
-@Component
-public class BorderlandCommand implements BotCommand {
+@Command(name = {"red"})
+public class BorderlandCommand implements AnyCommand {
 
-
-    private static HashMap<String,String> borderlandsData = new HashMap<>();
+    private static final HashMap<String, String> borderlandsData = new HashMap<>();
 
     @PostConstruct
     public void initData() throws IOException {
@@ -41,44 +40,39 @@ public class BorderlandCommand implements BotCommand {
         for (Element redTextElement : redTextElements) {
             String text = redTextElement.text();
             int i = text.indexOf(" ");
-            if (i!=-1){
+            if (i != -1) {
                 String substring = text.substring(0, i);
-                borderlandsData.put(substring,redTextElement.nextElementSibling().text());
-            }else {
-                borderlandsData.put(text,redTextElement.nextElementSibling().text());
+                borderlandsData.put(substring, redTextElement.nextElementSibling().text());
+            } else {
+                borderlandsData.put(text, redTextElement.nextElementSibling().text());
             }
         }
     }
 
     @Override
-    public String command() {
-        return "red";
-    }
-
-    @Override
-    public Message execute(Member sender, MessageChain messageChain, Contact contact,String...args) {
+    public Message execute(User sender, MessageChain messageChain, Contact contact, String... args) {
         MessageChainBuilder messageChainBuilder = new MessageChainBuilder();
         List<String> findResult = find(args[0]);
-        if (findResult!=null){
+        if (findResult != null) {
             messageChainBuilder.append("查询结果匹配以下红字:\n");
             for (String s : findResult) {
                 messageChainBuilder.append(s).append("\n");
             }
             return messageChainBuilder.build();
-        }else {
+        } else {
             return messageChainBuilder.append(borderlandsData.get(args[0])).build();
         }
     }
 
-    public List<String> find(String findStr){
+    public List<String> find(String findStr) {
         Set<String> keySet = borderlandsData.keySet();
         List<String> findList = new ArrayList<>();
-        if (keySet.contains(findStr)){
+        if (keySet.contains(findStr)) {
             return null;
-        }else {
+        } else {
             for (String key : keySet) {
                 boolean matches = Pattern.matches(".*" + findStr + ".*", key);
-                if (matches){
+                if (matches) {
                     findList.add(key);
                 }
             }
