@@ -68,7 +68,7 @@ public class GroupMessageHandler extends SimpleListenerHost {
             groupEvent.getGroup().sendMessage(ApiUtil.getV2TopicInfo(message));
         }
         if (!matchesBili && !matchesV2 && message.startsWith("http")){
-                for (String block : blackListConfig.getWebSite()) {
+                for (String block : blackListConfig.getWebsite()) {
                     if (message.contains(block)){
                         groupEvent.getGroup().sendMessage(blackListConfig.getReturnWords());
                         return ListeningStatus.LISTENING;
