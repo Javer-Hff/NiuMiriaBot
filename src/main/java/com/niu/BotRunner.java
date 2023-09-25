@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.mamoe.mirai.Bot;
 import net.mamoe.mirai.BotFactory;
+import net.mamoe.mirai.event.events.GroupEvent;
 import net.mamoe.mirai.utils.BotConfiguration;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
@@ -55,8 +56,12 @@ public class BotRunner implements CommandLineRunner {
         };
 
         bot = BotFactory.INSTANCE.newBot(botConfig.getQq(), botConfig.getPassword(), config);
-        //注册事件监听器
-        bot.getEventChannel().registerListenerHost(groupMessageHandler);
+        //注册群消息事件监听器
+        bot.getEventChannel().filter(botEvent ->
+                botEvent instanceof GroupEvent && listeningGroup.contains(
+                    ((GroupEvent) botEvent).getGroup().getId()
+            )
+        ).registerListenerHost(groupMessageHandler);
 
         bot.login();
 
