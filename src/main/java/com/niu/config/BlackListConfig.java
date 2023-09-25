@@ -13,7 +13,7 @@ import java.util.List;
 public class BlackListConfig {
 
     //只要链接包含则屏蔽
-    private List<String> webSite;
+    private List<String> website;
 
     @Value("return-words")
     private String returnWords;
