@@ -26,6 +26,7 @@ replay_pid*
 
 .idea/
 cache/
+target/
 *.png
 *.jpg
 android_pad.json
