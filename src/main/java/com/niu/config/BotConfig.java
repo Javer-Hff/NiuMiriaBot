@@ -1,14 +1,14 @@
 package com.niu.config;
 
 import lombok.Data;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-import java.util.List;
+import java.util.HashSet;
 
 /**
  * 读取Bot配置
+ *
  * @authoer:hff
  * @Date 2023/8/1 9:34
  */
@@ -28,6 +28,8 @@ public class BotConfig {
     private String workdir;
     //命令参数分隔符
     private String split;
+    //指令头
+    private HashSet<Character> commandHeads;
     //代理IP
 //    @Value("${bot.proxy.host}")
 //    private String host;
@@ -35,5 +37,5 @@ public class BotConfig {
 //    @Value("${bot.proxy.port}")
 //    private int port;
     //监听群组列表
-    private List<Long> listeningGroup;
+    private HashSet<Long> listeningGroup;
 }

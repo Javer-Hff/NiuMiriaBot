@@ -25,10 +25,14 @@ hs_err_pid*
 replay_pid*
 
 .idea/
+target/
 cache/
 target/
 *.png
 *.jpg
-android_pad.json
 deviceInfo.json
 src/main/resources/application-local.yml
+/txlib/8.9.70/.system_android_l2
+/txlib/8.9.70/stderr
+/txlib/8.9.70/stdin
+/txlib/8.9.70/stdout

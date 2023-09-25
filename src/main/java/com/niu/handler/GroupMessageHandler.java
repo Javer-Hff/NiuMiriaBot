@@ -1,9 +1,7 @@
 package com.niu.handler;
 
-import com.niu.command.BotCommand;
 import com.niu.config.BlackListConfig;
-import com.niu.config.BotConfig;
-import com.niu.config.CommandConfig;
+import com.niu.core.command.CommandManager;
 import com.niu.util.ApiUtil;
 import com.niu.util.SeleniumUtil;
 import kotlin.coroutines.CoroutineContext;
@@ -20,8 +18,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.InputStream;
-import java.util.Arrays;
-import java.util.List;
 import java.util.regex.Pattern;
 
 /**
@@ -31,12 +27,6 @@ import java.util.regex.Pattern;
  */
 @Component
 public class GroupMessageHandler extends SimpleListenerHost {
-
-    @Autowired
-    private BotConfig botConfig;
-
-    @Autowired
-    private CommandConfig commandConfig;
 
     @Autowired
     public BlackListConfig blackListConfig;
@@ -56,19 +46,12 @@ public class GroupMessageHandler extends SimpleListenerHost {
     @NotNull
     @EventHandler
     public ListeningStatus onMessage(@NotNull GroupMessageEvent groupEvent) {
-        boolean isListening = botConfig.getListeningGroup().contains(groupEvent.getGroup().getId());
-        //获取消息内容以配置中的分隔符做拆分，第一个为指令头，用于匹配，后续分割出的为指令参数
-        String message = groupEvent.getMessage().contentToString();
-        String[] split = message.split(botConfig.getSplit());
-        BotCommand command = commandConfig.getCommand(split[0]);
-        if (command!=null){
-            List<String> args = Arrays.stream(split).skip(1).toList();
-            Message executeResult = command.execute(groupEvent.getSender(), groupEvent.getMessage(), groupEvent.getGroup(),args.toArray(new String[0]));
-            if (executeResult!=null){
-                groupEvent.getGroup().sendMessage(executeResult);
-            }
+        Message execute = CommandManager.execute(groupEvent);
+        if (execute != null) {
+            groupEvent.getGroup().sendMessage(execute);
         }
 
+        String message = groupEvent.getMessage().contentToString();
 
         //TODO 以下无指令头触发事件注册到BotEvent接口下实现
         //正则匹配bibiURL

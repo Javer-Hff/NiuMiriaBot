@@ -12,6 +12,7 @@ bot:
   v2token:
   workdir:
   proxy:
-    host:
-    port:
+    host: localhost
+    port: 7890
   split: ' '
+  commandHeads:
