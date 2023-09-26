@@ -58,7 +58,7 @@ public class CommandManager {
         String content = event.getMessage().contentToString();
         String[] splits;
         // 无配置指令头则不需要验证
-        if (commandHeads == null) {
+        if (commandHeads == null || commandHeads.size()==0) {
             splits = content.split(split);
         }
         // 配置指令头则需要验证首字符

@@ -15,6 +15,7 @@ import xyz.cssxsh.mirai.tool.FixProtocolVersion;
 
 import java.io.File;
 import java.util.HashSet;
+import java.util.Map;
 
 /**
  * Bot启动类
@@ -34,18 +35,25 @@ public class BotRunner implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        // 加载修复插件
-        FixProtocolVersion.update();
+
         // 加载签名服务
-        QSignService.Factory.init(new File("txlib/8.9.70"));
+        QSignService.Factory.init(new File("txlib/8.9.73"));
         QSignService.Factory.loadProtocols(null);
         QSignService.Factory.register();
+
+        // 加载修复插件
+        FixProtocolVersion.update();
 
         System.out.println(">>>>>>>>>>start>>>>>>>>>>");
 
         HashSet<Long> listeningGroup = botConfig.getListeningGroup();
         for (Long groupId : listeningGroup) {
             System.out.println("listening group:" + groupId);
+        }
+
+        Map<BotConfiguration.MiraiProtocol, String> info = FixProtocolVersion.info();
+        for (Map.Entry<BotConfiguration.MiraiProtocol, String> miraiProtocolStringEntry : info.entrySet()) {
+            System.out.println(miraiProtocolStringEntry.getKey() + ":" +miraiProtocolStringEntry.getValue());
         }
 
         BotConfiguration config = new BotConfiguration() {
